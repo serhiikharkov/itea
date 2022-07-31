@@ -12,20 +12,29 @@ You can use the following folder structure or create your own:
 │  └─ <your project>
 └─ 2_application
    └─ <your project>
+   
 1. Infrastructure Test
+   
 Build out some basic Infrastructure in AWS or GCP to deploy Golang server that can be used in a repeatable way. Bonus points for the following:
 
-Use of Terraform.
-Use of Kubernetes.
-Clearly explaining why you're doing things a certain way.
-Providing a PNG diagram of your infrastructure.
+--Use of Terraform.
+   
+--Use of Kubernetes.
+   
+--Clearly explaining why you're doing things a certain way.
+   
+--Providing a PNG diagram of your infrastructure.
+   
 2.1 Application (CI/CD)
+   
 Use a tool of your choice such as Ansible, Bash, Chef, Puppet or similar to automate the docker build and deploy of the Golang server that serves some static or dynamic content. Bonus points for the following:
 
 Using Containers as part of your automation.
 Creating a CI pipeline, using a tool of your choice, that deploys the web server to a cloud environment of your choice.
 Serve traffic from 443 port with self-signed or public certificate would be highly appreciate.
+   
 2.2 Application (Coding)
+   
 Add a new handler in Golang application of your choice that does something you'd normally end up having to do manually. Some ideas:
 
 Backing up a file and sending the output to a cloud storage solution(S3).
