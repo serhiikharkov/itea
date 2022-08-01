@@ -71,6 +71,7 @@ stages:
         secureFile: 'id_ed25519.pub-CentOSksiITEA'       
     - task: Bash@3
       displayName: IncrementVar
+      enabled: false
       name: IncrementVar
       inputs:
         targetType: 'inline'
