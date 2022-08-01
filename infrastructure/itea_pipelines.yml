@@ -199,7 +199,7 @@ stages:
         artifactName: '$(PublicManifest)'
         targetPath: '$(Pipeline.Workspace)/$(PublicManifest)'
     - task: KubernetesManifest@0
-      enabled: true
+      enabled: false
       inputs:
         action: 'createSecret'
         kubernetesServiceConnection: '$(AKSclusterName)-$(NameSpaceDeploy)'
@@ -210,7 +210,7 @@ stages:
 
     - task: Bash@3
       displayName: ShowVarsANDreplace
-      enabled: true
+      enabled: false
       name: ShowVars2
       inputs:
         targetType: 'inline'
@@ -235,6 +235,7 @@ stages:
           cat $(DeployRedisYML)
           echo "--------------------cat file----------------------------"
     - task: KubernetesManifest@0
+      enabled: false
       displayName: Deploy matifests AKS
       inputs:
         action: 'deploy'
