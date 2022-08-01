@@ -16,25 +16,27 @@ pool: ITEA
 
 variables:
   app: 'api'
-  BRANCH: 'itea-spp'
+  BRANCH: 'itea-app'
   poolvar: CentOS
-  ACRvar: 'ksi-dopsaks'
+  ACRvar: 'ksidopsaks'
   imagerRepo: '$(BRANCH)-$(app)'
   tag: '$(Build.BuildId)'
-  NameSpaceDeploy: 'dops-production-it'
+  NameSpaceDeploy: 'dops-ITEA'
   URKACR: '$(ACRvar).azurecr.io'
   ACRurlVar: "$(ACRvar).azurecr.io/$(imagerRepo)"
 ############ VAL ENV ############################################
 
 
 ############ AKS creds ##########################################
+  AZdOpsSubs: '0a9d7e08-2c25-490e-91f1-50d623a71015'
+  AKSclusterName: 'ITEA' 
+  PAT: 'lqzdwp7liiflebah5wewsff7gxfbdv23utoxyunhkzwbgfb2ibnq'
+  AZD_URL: 'https://dev.azure.com/itea-ksi/itea'
 
 
-
-#  AKSRG: 'dOPS_storage'
 #########  GIT ##################################################
   GitBranch: 'master'
-  GitLink: 'git@github.com:elgmetals/dops.git'
+  GitLink: 'git@github.com:sergharkov/itea.git'
   GitUserName: 'Azure_DevOps_Pipeline'
   GitUserMAil: 'ksi@ksi.kiev.ua'  
 ########  Manifests  ############################################
@@ -44,7 +46,7 @@ variables:
   DeployServiceYML: '$(Pipeline.Workspace)/$(PublicManifest)/CI-services.yml'
   URLconteiner: '$(URKACR)/$(imagerRepo):$(Build.BuildNumber)'
 ########  Manifests  ############################################  
-  VarFileVersion: '$(Build.SourcesDirectory)/azureDevops-CI/UnTriger/CI-Version.txt'
+  VarFileVersion: '$(Build.SourcesDirectory)/CI-Version.txt'
   
 stages:
 ##################################################
@@ -58,15 +60,15 @@ stages:
     pool: $(poolvar)
     steps:
     - task: DownloadSecureFile@1
-      enabled: false
+      enabled: true
       displayName: Add Secure File SSH KEY
       inputs:
-        secureFile: 'id_ed25519-CentOSksiProd'
+        secureFile: 'id_ed25519-CentOSksiITEA'
     - task: DownloadSecureFile@1
-      enabled: false
+      enabled: true
       displayName: Add Secure File  PUB
       inputs:
-        secureFile: 'id_ed25519.pub-CentOSksiProd'       
+        secureFile: 'id_ed25519.pub-CentOSksiITEA'       
     - task: Bash@3
       displayName: IncrementVar
       name: IncrementVar
@@ -84,12 +86,12 @@ stages:
           mkdir -p ~/.ssh
           touch ~/.ssh/known_hosts
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          cp -f $(Agent.TempDirectory)/id_ed25519-CentOSksiProd ~/.ssh/id_ed25519
-          cp -f $(Agent.TempDirectory)/id_ed25519.pub-CentOSksiProd ~/.ssh/id_ed25519.pub
+          cp -f $(Agent.TempDirectory)/id_ed25519-CentOSksiITEA ~/.ssh/id_ed25519
+          cp -f $(Agent.TempDirectory)/id_ed25519.pub-CentOSksiITEA ~/.ssh/id_ed25519.pub
           chmod =600 ~/.ssh/id_ed25519
 
           echo -e '\n########################## get build number ###############################'
-          BuildNumber=$(($(echo $(IT_build_number)) + 1))  ###############################################
+          BuildNumber=$(($(echo $(app_build_number)) + 1))  ###############################################
           echo "BuildNumber       "$BuildNumber
           echo "VarFileVersion    "$(VarFileVersion)
           DargVersionLocal="$(major_number).$BuildNumber.$(BRANCH)"
