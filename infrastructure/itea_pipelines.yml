@@ -1,248 +1,39 @@
 # Go
-# Itea exam task
-trigger:
-  batch: true  #when a pipeline is running, the system waits until the run is completed, then starts another run with all changes
-  branches:
-    include:
-    - 'master'
-  paths:
-   exclude:
-     -  '*'
-resources:
-- repo: self
+# Build your Go project.
+# Add steps that test, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/go
 
-pool: ITEA
-#  vmImage: 'ubuntu-latest'
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
 
 variables:
-  app: 'api'
-  BRANCH: 'itea-app'
-  poolvar: ITEA
-  ACRvar: 'ksidopsaks'
-  imagerRepo: '$(BRANCH)-$(app)'
-  tag: '$(Build.BuildId)'
-  NameSpaceDeploy: 'dops-ITEA'
-  URKACR: '$(ACRvar).azurecr.io'
-  ACRurlVar: "$(ACRvar).azurecr.io/$(imagerRepo)"
-############ VAL ENV ############################################
+  GOBIN:  '$(GOPATH)/bin' # Go binaries path
+  GOROOT: '/usr/local/go1.11' # Go installation path
+  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
+  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
+steps:
+- script: |
+    mkdir -p '$(GOBIN)'
+    mkdir -p '$(GOPATH)/pkg'
+    mkdir -p '$(modulePath)'
+    shopt -s extglob
+    shopt -s dotglob
+    mv !(gopath) '$(modulePath)'
+    echo '##vso[task.prependpath]$(GOBIN)'
+    echo '##vso[task.prependpath]$(GOROOT)/bin'
+  displayName: 'Set up the Go workspace'
 
-############ AKS creds ##########################################
-  AZdOpsSubs: '0a9d7e08-2c25-490e-91f1-50d623a71015'
-  AKSclusterName: 'ITEA' 
-  PAT: 'lqzdwp7liiflebah5wewsff7gxfbdv23utoxyunhkzwbgfb2ibnq'
-  AZD_URL: 'https://dev.azure.com/itea-ksi/itea'
-
-
-#########  GIT ##################################################
-  GitBranch: 'master'
-  GitLink: 'git@github.com:sergharkov/itea.git'
-  GitUserName: 'Azure_DevOps_Pipeline'
-  GitUserMAil: 'ksi@ksi.kiev.ua'  
-########  Manifests  ############################################
-  PublicManifest: 'DeployManifest'
-  OnGITmanifests: '$(Build.SourcesDirectory)/infrastructure/Manifests/'
-  DeployAppYML: '$(Pipeline.Workspace)/$(PublicManifest)/CI-deploy-app.yml'
-  DeployServiceYML: '$(Pipeline.Workspace)/$(PublicManifest)/CI-services.yml'
-  URLconteiner: '$(URKACR)/$(imagerRepo):$(Build.BuildNumber)'
-########  Manifests  ############################################  
-  VarFileVersion: '$(Build.SourcesDirectory)/CI-Version.txt'
-  
-stages:
-##################################################
-- stage: BuildUIimage
-  variables:
-  - group: buildsENV
-  displayName: Build UI image
-  jobs:
-  - job: BuildUI
-    displayName: BuildUI
-    pool: $(poolvar)
-    steps:
-    - task: DownloadSecureFile@1
-      enabled: true
-      displayName: Add Secure File SSH KEY
-      inputs:
-        secureFile: 'id_ed25519-CentOSksiITEA'
-    - task: DownloadSecureFile@1
-      enabled: true
-      displayName: Add Secure File  PUB
-      inputs:
-        secureFile: 'id_ed25519.pub-CentOSksiITEA'       
-    - task: Bash@3
-      displayName: IncrementVar
-      enabled: false
-      name: IncrementVar
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "-------------------------------------------------------"
-          echo "ACRurlVar                           >>>>   $(ACRurlVar)"
-          echo "imagerRepo                          >>>>   $(imagerRepo)"
-          echo "--------------------Libs Var Groups -----------------------------------"
-          echo "Sandbox_build_number     >$(app_build_number) " 
-
-          echo '#########################add public key ##########################'
-          ls -l $(Agent.TempDirectory)
-          mkdir -p ~/.ssh
-          touch ~/.ssh/known_hosts
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          cp -f $(Agent.TempDirectory)/id_ed25519-CentOSksiITEA ~/.ssh/id_ed25519
-          cp -f $(Agent.TempDirectory)/id_ed25519.pub-CentOSksiITEA ~/.ssh/id_ed25519.pub
-          chmod =600 ~/.ssh/id_ed25519
-
-          echo -e '\n########################## get build number ###############################'
-          BuildNumber=$(($(echo $(app_build_number)) + 1))  ###############################################
-          echo "BuildNumber       "$BuildNumber
-          echo "VarFileVersion    "$(VarFileVersion)
-          DargVersionLocal="$(major_number).$BuildNumber.$(BRANCH)"
-          echo "DargVersionLocal         >>$DargVersionLocal"
-          echo -e "\n######################## update build number ##############################"
-          
-          az extension add --name azure-devops
-          echo  $PAT | az devops login --organization $AZD_URL
-          az account set --subscription $AZdOpsSubs
-          az devops configure -d organization=$AZD_URL project=$AZD_P
-          az pipelines variable-group list \
-            --group-name buildsENV \
-            --top 30
-            
-          az pipelines variable-group variable update \
-            --id $VGID \
-            --name app_build_number \
-            --value $BuildNumber
-
-          az pipelines variable-group list \
-            --group-name buildsENV \
-            --top 30
-          echo -e "\n###########################################################################"
-          ####change global variables##################
-          echo "##vso[build.updatebuildnumber]$DargVersionLocal"
-    - task: Bash@3
-      displayName: Git Push increment
-      enabled: false
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "######################## git push ################################"
-          git add $(VarFileVersion)
-          git commit -m "change file version.txt add Version $(Build.BuildNumber)"
-          git status
-          echo "++++++"$(GitBranch)
-          git push origin $(GitBranch)
-
-    - task: Bash@3
-      displayName: GO build
-      enabled: true
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "------------------Versions11111111--------------------------------"
-          echo "Build.BuildNumber        >$(Build.BuildNumber)"
-          cd $(Build.SourcesDirectory)/$(app)/
-          
-          
-          
-          
-          
-          VERSION="$(Build.BuildNumber)" APP_ENV="$(BRANCH)" yarn build
-          echo "VERSION                       --> "$VERSION
-          echo "APP_ENV                       --> "$APP_ENV
-          echo "BRANCH                        --> "$(BRANCH)
-          echo "SOURCE_COMMIT_local           --> "$SOURCE_COMMIT_local
-
-    - task: Docker@2
-      displayName: Build and Push an image
-      enabled: true
-      inputs:
-        containerRegistry: $(ACRvar)
-        repository: '$(imagerRepo)'
-        command: 'buildAndPush'
-        Dockerfile: '$(Build.SourcesDirectory)/$(app)/Dockerfile'
-        tags: |
-          $(Build.BuildNumber)
-          latest
-
-    - task: PublishBuildArtifacts@1
-      displayName: PUblish Manifest
-      inputs:
-        PathtoPublish: '$(OnGITmanifests)'
-        ArtifactName: $(PublicManifest)
-        publishLocation: 'Container'
-#===================================================================================================
-#===================================  Stage Deploy  UI to AKS ======================================
-#===================================================================================================
-- stage: DeployUI
-  displayName: Deploy UI RADIS to AKS
-  dependsOn: BuildUIimage
-  variables:
-    acrsecret: k8sexamplesacrauth
-  jobs:
-  - job: DeployUI
-    displayName: Deploy to AKS
-    pool: $(poolvar)
-    steps:
-
-    - task: Bash@3
-      displayName: ShowVars
-      name: ShowVars
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "-------------------------------------------------------"
-          echo "SOURCE_COMMIT           --> "$(SOURCE_COMMIT)
-          echo "URLconteiner            --> "$(URLconteiner)
-          echo "build build number      --> "$(build.buildnumber)
-
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: 'current'
-        artifactName: '$(PublicManifest)'
-        targetPath: '$(Pipeline.Workspace)/$(PublicManifest)'
-    - task: KubernetesManifest@0
-      enabled: false
-      inputs:
-        action: 'createSecret'
-        kubernetesServiceConnection: '$(AKSclusterName)-$(NameSpaceDeploy)'
-        namespace: '$(NameSpaceDeploy)'
-        secretType: 'dockerRegistry'
-        secretName: '$(acrsecret)'
-        dockerRegistryEndpoint: $(ACRvar)
-
-    - task: Bash@3
-      displayName: ShowVarsANDreplace
-      enabled: false
-      name: ShowVars2
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo "-------------------------------------------------------"
-          echo "SOURCE_COMMIT           --> "$(SOURCE_COMMIT)
-          echo "URLconteiner            -->  $(URLconteiner)"
-          echo "build build number      --> "$(build.buildnumber)
-          $echo "VarFileVersion          --> "$(VarFileVersion)
-          echo "DeployAppYML            --> "$(DeployAppYML)
-          echo "DeployRedisYML          --> "$(DeployRedisYML)
-          echo "--------------------cat services manifest-----------------------------------"
-          cat $(DeployServiceYML)
-          echo "--------------------replase build number in file----------------------------"
-          cat $(DeployAppYML)
-          sed -i "s/BUILDnumberVAR/$(Build.BuildNumber)/g" $(DeployAppYML)
-          echo "---------------------replase URL ACR in file--------------------------------"
-          sed -i "s#{{URLconteiner}}#$(URLconteiner)#g" $(DeployAppYML)
-          echo "------------------------cat file DeployAppYML--------------------------------------------"
-          cat $(DeployAppYML)
-          echo "--------------------cat file DeployRedisYML----------------------------"
-          cat $(DeployRedisYML)
-          echo "--------------------cat file----------------------------"
-    - task: KubernetesManifest@0
-      enabled: false
-      displayName: Deploy matifests AKS
-      inputs:
-        action: 'deploy'
-        kubernetesServiceConnection: '$(AKSclusterName)-$(NameSpaceDeploy)'
-        namespace: '$(NameSpaceDeploy)'
-        manifests: |
-          $(DeployAppYML)
-          $(DeployRedisYML)
-          $(DeployServiceYML)
+- script: |
+    go version
+    go get -v -t -d ./...
+    if [ -f Gopkg.toml ]; then
+        curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+        dep ensure
+    fi
+    go build -v .
+  workingDirectory: '$(modulePath)'
+  displayName: 'Get dependencies, then build'
