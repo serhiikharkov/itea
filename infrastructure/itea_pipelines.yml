@@ -50,13 +50,13 @@ variables:
   
 stages:
 ##################################################
-- stage: BuildUIimage
+- stage: BuildAppimage
   variables:
   - group: buildsENV
-  displayName: Build UI image
+  displayName: Build App image
   jobs:
   - job: BuildUI
-    displayName: BuildUI
+    displayName: BuildApp
     pool: $(poolvar)
     steps:
     - task: DownloadSecureFile@1
@@ -84,12 +84,6 @@ stages:
           echo "PAT------------------>$(PAT)"
           echo '#########################add public key ##########################'
           ls -l $(Agent.TempDirectory)
-          #mkdir -p ~/.ssh
-          #touch ~/.ssh/known_hosts
-          #ssh-keyscan github.com >> ~/.ssh/known_hosts
-          #cp -f $(Agent.TempDirectory)/id_ed25519-CentOSksiProd ~/.ssh/id_ed25519
-          #cp -f $(Agent.TempDirectory)/id_ed25519.pub-CentOSksiProd ~/.ssh/id_ed25519.pub
-          #chmod =600 ~/.ssh/id_ed25519
 
           echo -e '\n########################## get build number ###############################'
           BuildNumber=$(($(echo $(app_build_number)) + 1))  ###############################################
@@ -124,6 +118,12 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          #mkdir -p ~/.ssh
+          #touch ~/.ssh/known_hosts
+          #ssh-keyscan github.com >> ~/.ssh/known_hosts
+          #cp -f $(Agent.TempDirectory)/id_ed25519-CentOSksiProd ~/.ssh/id_ed25519
+          #cp -f $(Agent.TempDirectory)/id_ed25519.pub-CentOSksiProd ~/.ssh/id_ed25519.pub
+          #chmod =600 ~/.ssh/id_ed25519
           echo "######################## git push ################################"
           git add $(VarFileVersion)
           git commit -m "change file version.txt add Version $(Build.BuildNumber)"
@@ -158,8 +158,8 @@ stages:
 #===================================================================================================
 #===================================  Stage Deploy  UI to AKS ======================================
 #===================================================================================================
-- stage: DeployUI
-  displayName: Deploy UI RADIS to AKS
+- stage: DeployApp
+  displayName: Deploy app to AKS
   dependsOn: BuildUIimage
   variables:
     acrsecret: k8sexamplesacrauth
@@ -226,3 +226,15 @@ stages:
         manifests: |
           $(DeployAppYML)
           $(DeployServiceYML)
+
+    - task: Bash@3
+      displayName: ShowVars
+      name: ShowVars
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "-------------------------------------------------------"
+          docker image ls
+          docker image rm $(docker image ls -q) -f   clear all images
+          docker image ls
+          docker system df
