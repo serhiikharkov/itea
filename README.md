@@ -1,3 +1,24 @@
+My describe
+
+realize on:
+
+---AKS 1.23.8
+
+---AKS create by AzureCLI command on bash infrastructure/cluster.sh
+
+---CI/CD AzureDevOps  pipelines + libraries(for save SecretsVariables and BuildIncremant) triger on main branch
+
+---finish show site with
+
+   ++++ Treafik https://itea.ksi.kiev.ua/dashboard/#   admin:dashboard
+   
+   ++++ Resalt Go code ./application/server.go   https://itea.ksi.kiev.ua
+   
+   
+-----------------------------------------------------------------------------------
+
+Task:
+
 DevOps Technical Task
 All infrastructure components advised to be represented as code, and provisioning of resources should be automated as much as possible.
 
