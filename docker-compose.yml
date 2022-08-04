@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   webspa:
-    image: registry.infopulse.local/pacelicsrv-prod/webspa
+    image: dopsaks.azurecr.io/itea-ui:latest 
     build:
       context: .    
       dockerfile: ./Dckerfile

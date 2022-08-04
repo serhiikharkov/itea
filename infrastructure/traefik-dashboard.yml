@@ -1,0 +1,28 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard-https
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`itea.ksi.kiev.ua`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      services:
+        - name: api@internal
+          kind: TraefikService
+      middlewares:
+        - name: traefik-dashboard-auth # Referencing the BasicAuth middleware
+          namespace: traefik
+  tls:
+    certResolver: itea
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-dashboard-auth
+  namespace: traefik
+spec:
+  basicAuth:
+    secret: traefik-dashboard-auth-secret
