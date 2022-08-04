@@ -1,9 +1,8 @@
 FROM golang:latest
 
+RUN mkdir /app
+ADD application/server.go /app
 WORKDIR /app
-
-COPY ./ /app
-
-RUN go mod download
-
-ENTRYPOINT go run application/server.go
+RUN ls /app
+RUN go build server.go
+CMD ["/app/server"]
