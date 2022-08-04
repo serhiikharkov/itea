@@ -228,8 +228,8 @@ stages:
           $(DeployServiceYML)
           
     - task: Bash@3
-      displayName: ShowVars
-      name: ShowVars
+      displayName: ClearImages
+      name: ClearImages
       inputs:
         targetType: 'inline'
         script: |
