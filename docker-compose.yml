@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  webspa:
+    image: dopsaks.azurecr.io/itea-ui:latest
+    build:
+      context: .    
+      dockerfile: ./Dckerfile
+    environment:
+      - VERSION=1
+      - ENV=itea
+    ports:
+      - "8000:80"

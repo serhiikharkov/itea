@@ -1,0 +1,81 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dops-production-it-service-ingress-route-http
+  annotations:
+    traefik.ingress.kubernetes.io/service.passhostheader: "true"
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`itea.ksi.kiev.ua`)
+      services:
+        - name: app-go-v1
+          port: 80
+      middlewares:
+        - name: api-http-redirect
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dops-production-it-service-ingress-route
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`itea.ksi.kiev.ua`)
+      services:
+        - name: app-go-v1
+          port: 80
+#################/v2/api-docs#########################          
+    - kind: Rule
+      match: Host(`itea.ksi.kiev.ua`) && PathPrefix(`/v2`)
+      middlewares:
+        - name: api-prefix-itea
+        - name: svc-rancher-headers-wss
+      services:
+        - name: app-gov2
+          port: 3000           
+
+  tls:
+    certResolver: itea
+
+#  tls:
+#    secretName: itea-cert-letsencript-secret
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: api-http-redirect
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: api-prefix-itea
+spec:
+#  basicAuth:
+#    secret: service-auth-secret
+  stripPrefix:
+    prefixes:
+      - /api
+      - "/v2"
+    forceSlash: false
+#  redirectScheme:
+#    scheme: https
+#    permanent: true
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: svc-rancher-headers-wss
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"

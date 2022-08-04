@@ -1,0 +1,23 @@
+#------------------------------------
+#for deploying Traefik, the static configuration
+additionalArguments:
+logs:
+  general:
+    level: DEBUG
+  access:
+    enable: true
+    format: json
+additionalArguments:
+  - "--certificatesresolvers.itea.acme.tlschallenge=true"
+  - "--certificatesresolvers.itea.acme.email=itea@ksi.kiev.ua"
+  - "--certificatesresolvers.itea.acme.storage=/data/acme.json"
+  - "--metrics.prometheus=true"
+  - "--pilot.token=1ffa4876-8536-4f30-8045-5c16dcf58f02"
+  - "--api.dashboard=true"
+deployment:
+  replicas: 1
+service:
+  spec:
+    loadBalancerIP: 13.81.32.217
+  annotations:
+    "service.beta.kubernetes.io/azure-load-balancer-resource-group": MC_itea-rg_aks-itea_westeurope
