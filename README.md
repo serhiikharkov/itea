@@ -15,6 +15,7 @@ realize on:
    ++++ Resalt Go code ./application/server.go   https://itea.ksi.kiev.ua
    
    
+![This is an image](./itea/infrastructure/draw.png)
 -----------------------------------------------------------------------------------
 
 Task:
