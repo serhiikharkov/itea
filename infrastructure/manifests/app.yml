@@ -1,0 +1,58 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dops-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dops-api
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: dops-api
+        buildnumber: BUILDnumberVAR
+      annotations:
+        timestamp: '1635278192'
+    spec:
+      containers:
+        - name: dops-api-container
+          image: {{URLconteiner}}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+
+          resources:
+            limits:
+              memory: 1536Mi
+            requests:
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /api/ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 3
+            timeoutSeconds: 1
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+        - name: dops-acr
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
