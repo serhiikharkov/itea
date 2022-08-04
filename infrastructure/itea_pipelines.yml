@@ -41,9 +41,9 @@ variables:
   GitUserMAil: 'ksi@ksi.kiev.ua'  
 ########  Manifests  ############################################
   PublicManifest: 'DeployManifest'
-  OnGITmanifests: '$(Build.SourcesDirectory)/azureDevops-CI/Prod/Manifests/'
-  DeployAppYML: '$(Pipeline.Workspace)/$(PublicManifest)/CI-deploy-$(app).yml'
-  DeployServiceYML: '$(Pipeline.Workspace)/$(PublicManifest)/CI-services.yml'
+  OnGITmanifests: '$(Build.SourcesDirectory)/infrastructure/manifests/'
+  DeployAppYML: '$(Pipeline.Workspace)/$(PublicManifest)/app.yml'
+  DeployServiceYML: '$(Pipeline.Workspace)/$(PublicManifest)/svc.yml'
   URLconteiner: '$(URKACR)/$(imagerRepo):$(Build.BuildNumber)'
 ########  Manifests  ############################################  
 #  VarFileVersion: '$(Build.SourcesDirectory)/azureDevops-CI/UnTriger/CI-Version.txt'
