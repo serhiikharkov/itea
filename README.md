@@ -15,11 +15,10 @@ realize on:
    ++++ Resalt Go code ./application/server.go   https://itea.ksi.kiev.ua
    
    
-
-
-
+-----------------------------------------------------------------------------------
 
 Task:
+
 DevOps Technical Task
 All infrastructure components advised to be represented as code, and provisioning of resources should be automated as much as possible.
 
