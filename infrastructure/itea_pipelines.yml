@@ -162,7 +162,6 @@ stages:
       inputs:
         secureFile: 's-img-print'
 
-
     - task: KubernetesManifest@0
       enabled: true
       displayName: CreateSecret-img-go
@@ -174,7 +173,16 @@ stages:
         secretName: 's-img-print'
         secretArguments: '--from-file=s-img-print=$(Agent.TempDirectory)/s-img-print'
 
-
+    - task: KubernetesManifest@0
+      enabled: true
+      displayName: html-p
+      inputs:
+        action: 'createSecret'
+        kubernetesServiceConnection: '$(AKSclusterName)-$(NameSpaceDeploy)'
+        namespace: '$(NameSpaceDeploy)'
+        secretType: 'generic'
+        secretName: 'html-p'
+        secretArguments: '--from-literal=html-p="<p>"'
 
 #===================================================================================================
 #===================================  Stage Deploy  APP to AKS ======================================
