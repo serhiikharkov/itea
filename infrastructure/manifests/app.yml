@@ -23,10 +23,12 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-
+          env:
+            - name: BUILD_NUMBER
+              value: VAL_BUILD_NUMBER
           resources:
             limits:
-              memory: 536Mi
+              memory: 500Mi
             requests:
               memory: 100Mi
           readinessProbe:
