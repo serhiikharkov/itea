@@ -28,7 +28,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
     _, _ = fmt.Fprintf(w, "I'm running %s of a container. %s", inContainer, htmlvar)
     _, _ = fmt.Fprintf(w, "I'm running %s version container.\n",  os.Getenv("BUILD_NUMBER"))
     _, _ = fmt.Fprintf(w, "This is my first Go project. Within ITEA courses. %s", os.Getenv("HTML_P")) 
-    _, _ = fmt.Fprintf(w, "Sources you can find on my git https://github.com/sergharkov/itea .%s", os.Getenv("HTML_P") 
+    _, _ = fmt.Fprintf(w, "Sources you can find on my git https://github.com/sergharkov/itea .%s", os.Getenv("HTML_P"))
     _, _ = fmt.Fprintf(w, "\n %s \n", os.Getenv("IMG_PRINT"))
 }
 
