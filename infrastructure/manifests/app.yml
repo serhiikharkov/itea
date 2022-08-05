@@ -32,7 +32,13 @@ spec:
                 secretKeyRef:
                   name: s-img-print
                   key: s-img-print
-              
+
+            - name: HTML_P
+              valueFrom:
+                secretKeyRef:
+                  name: html-p
+                  key: html-p
+
           resources:
             limits:
               memory: 500Mi
