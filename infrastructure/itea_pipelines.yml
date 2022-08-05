@@ -156,7 +156,7 @@ stages:
         ArtifactName: $(PublicManifest)
         publishLocation: 'Container'
 #===================================================================================================
-#===================================  Stage Deploy  UI to AKS ======================================
+#===================================  Stage Deploy  APP to AKS ======================================
 #===================================================================================================
 - stage: DeployUI
   displayName: Deploy UI RADIS to AKS
@@ -211,7 +211,7 @@ stages:
           cat $(DeployServiceYML)
           echo "--------------------replase build number in file----------------------------"
           cat $(DeployAppYML)
-          sed -i "s/BUILDnumberVAR/$(Build.BuildNumber)/g" $(DeployAppYML)
+          sed -i "s/VAL_BUILD_NUMBER/$(Build.BuildNumber)/g" $(DeployAppYML)
           echo "---------------------replase URL ACR in file--------------------------------"
           sed -i "s#{{URLconteiner}}#$(URLconteiner)#g" $(DeployAppYML)
           echo "------------------------cat file DeployAppYML--------------------------------------------"
