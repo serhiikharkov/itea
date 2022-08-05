@@ -11,7 +11,7 @@ import (
 )
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
-
+  htmlvar1 := "p"
   fmt.Println(time.Now(), "Hello from my new fresh server")
 
 }
