@@ -155,6 +155,27 @@ stages:
         PathtoPublish: '$(OnGITmanifests)'
         ArtifactName: $(PublicManifest)
         publishLocation: 'Container'
+
+
+    - task: DownloadSecureFile@1
+      displayName: Add Secure File s-img-print
+      inputs:
+        secureFile: 's-img-print'
+
+
+    - task: KubernetesManifest@0
+      enabled: true
+      displayName: CreateSecret-img-go
+      inputs:
+        action: 'createSecret'
+        kubernetesServiceConnection: '$(AKSclusterName)-$(NameSpaceDeploy)'
+        namespace: '$(NameSpaceDeploy)'
+        secretType: 'generic'
+        secretName: 's-img-print'
+        secretArguments: '--from-file=s-img-print=$(Agent.TempDirectory)/s-img-print'
+
+
+
 #===================================================================================================
 #===================================  Stage Deploy  APP to AKS ======================================
 #===================================================================================================
