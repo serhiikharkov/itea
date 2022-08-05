@@ -19,12 +19,12 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
     myOS, myArch := runtime.GOOS, runtime.GOARCH
     inContainer := "inside"
-    htmlvar = "p"
     if _, err := os.Lstat("/.dockerenv"); err != nil && os.IsNotExist(err) {
         inContainer = "outside"
     }
     w.Header().Set("Content-Type", "text/html")
     w.WriteHeader(http.StatusOK)
+    htmlvar = "p"
     _, _ = fmt.Fprintf(w, "Hello, %s!\n", r.UserAgent())
     _, _ = fmt.Fprintf(w, "I'm running on %s/%s.\n", myOS, myArch)
     _, _ = fmt.Fprintf(w, "I'm running %s of a container.\n", inContainer)
