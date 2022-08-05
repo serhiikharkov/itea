@@ -24,7 +24,6 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
     }
     w.Header().Set("Content-Type", "text/html")
     w.WriteHeader(http.StatusOK)
-    htmlvar = "p"
     _, _ = fmt.Fprintf(w, "Hello, %s!\n", r.UserAgent())
     _, _ = fmt.Fprintf(w, "I'm running on %s/%s.\n", myOS, myArch)
     _, _ = fmt.Fprintf(w, "I'm running %s of a container.\n", inContainer)
