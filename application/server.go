@@ -15,7 +15,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-    htmlvar := "\<\\p\>"
+    htmlvar := "<\p>"
     myOS, myArch := runtime.GOOS, runtime.GOARCH
     inContainer := "inside"
     if _, err := os.Lstat("/.dockerenv"); err != nil && os.IsNotExist(err) {
@@ -25,7 +25,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     _, _ = fmt.Fprintf(w, "Hello, %s!\n", r.UserAgent())
     _, _ = fmt.Fprintf(w, "I'm running on %s/%s.\n", myOS, myArch)
-    _, _ = fmt.Fprintf(w, "I'm running %s of a container.\n", inContainer)
+    _, _ = fmt.Fprintf(w, "I'm running %s of a container. %s", inContainer, htmlvar)
     _, _ = fmt.Fprintf(w, "I'm running %s version container.\n",  os.Getenv("BUILD_NUMBER"))
     _, _ = fmt.Fprintf(w, "This is my first Go project. Within ITEA courses. %s", htmlvar) 
     _, _ = fmt.Fprintf(w, "Sources you can find on my git https://github.com/sergharkov/itea .\n") 
