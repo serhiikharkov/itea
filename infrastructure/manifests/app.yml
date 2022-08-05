@@ -26,6 +26,13 @@ spec:
           env:
             - name: BUILD_NUMBER
               value: VAL_BUILD_NUMBER
+              
+            - name: IMG_PRINT
+              valueFrom:
+                secretKeyRef:
+                  name: s-img-print
+                  key: s-img-print
+              
           resources:
             limits:
               memory: 500Mi
