@@ -7,7 +7,7 @@ import (
   "time"
    "os"
    "runtime"
-//   "text/template"
+   "text/template"
 )
 
 func appHandler(w http.ResponseWriter, r *http.Request) {
