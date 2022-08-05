@@ -175,7 +175,7 @@ stages:
 
     - task: KubernetesManifest@0
       enabled: true
-      displayName: html-p
+      displayName: CreateSecret html-p
       inputs:
         action: 'createSecret'
         kubernetesServiceConnection: '$(AKSclusterName)-$(NameSpaceDeploy)'
