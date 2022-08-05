@@ -15,7 +15,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-    htmlvar := "ppppppppppppppppppppppppppppppppppppppppppppp"
+    htmlvar := '<ppppppppppppppppppppppppppppppppppppppppppppp>'
     myOS, myArch := runtime.GOOS, runtime.GOARCH
     inContainer := "inside"
     if _, err := os.Lstat("/.dockerenv"); err != nil && os.IsNotExist(err) {
